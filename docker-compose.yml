@@ -1,0 +1,22 @@
+version: "2"
+services:
+    nginx:
+        container_name: nginx
+        build:
+            context: "./"
+            dockerfile: ./docker/Dockerfile.nginx
+        ports:
+            - "80:80"
+        links:
+            - web
+    web:
+        container_name: web
+        build:
+            context: "./"
+            dockerfile: ./docker/Dockerfile.web
+        ports:
+            - "7080:7080"
+        environment:
+            - ASPNETCORE_ENVIRONMENT=Development
+            - ASPNETCORE_CONTENTROOTPATH=/app
+            - USE_DOCKER_FOR_DEV=True

@@ -1,0 +1,20 @@
+version: '2'
+services:
+  nginx:
+    container_name: nginx
+    image: cre8tiv/cre8tiv-deploydemo-nginx:develop
+    links:
+      - web
+    ports:
+      - "80:80"
+    restart: always
+  web:
+    container_name: web
+    image: cre8tiv/cre8tiv-deploydemo-web:develop
+    expose:
+      - "5000"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Staging
+      - ASPNETCORE_CONTENTROOTPATH=/app
+      - USE_DOCKER_FOR_DEV=False
+    restart: always

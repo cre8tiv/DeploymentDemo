@@ -1,0 +1,9 @@
+FROM microsoft/aspnetcore-build:2.0
+
+ENV ASPNETCORE_ENVIRONMENT Development
+ENV USE_DOCKER_FOR_DEV True
+
+WORKDIR /app
+
+# Copy everything 
+COPY ./DemoProject/ ./

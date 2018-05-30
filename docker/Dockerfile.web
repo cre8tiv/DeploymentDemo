@@ -1,0 +1,18 @@
+FROM microsoft/aspnetcore-build:2.0 AS build-env
+
+ENV ASPNETCORE_ENVIRONMENT Development
+
+WORKDIR /app
+
+# Copy csproj and restore as distinct layers
+COPY ./DemoProject/*.csproj ./
+RUN dotnet restore
+
+# Copy everything else and build
+COPY ./DemoProject/ ./
+RUN dotnet publish -c Debug -o out
+
+# Copy the startup script
+COPY ./docker/startup.sh ./
+
+ENTRYPOINT ["/app/startup.sh"]
