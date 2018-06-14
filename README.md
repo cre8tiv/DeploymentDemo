@@ -117,3 +117,5 @@ Scan Multibranch Pipeline Triggers
 2. Set the Interval to 15 minutes
 
 You have now configured a job in Jenkins.  Let's test by creating a PR in GitHub...
+
+Since Jenkins is set to build on a pull request, we'll create a develop branch to trigger a build.
