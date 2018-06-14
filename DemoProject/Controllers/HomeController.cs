@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using DemoProject.Models;
 using Microsoft.AspNetCore.Mvc;
-using DemoProject.Models;
+using System.Diagnostics;
 
 namespace DemoProject.Controllers
 {
@@ -32,6 +28,25 @@ namespace DemoProject.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        public string GetEmployeeName(int employeeId)
+        {
+            string name;
+            if (employeeId == 1)
+            {
+                name = "Bob";
+            }
+            else if (employeeId == 2)
+            {
+                name = "Sue";
+            }
+            else
+            {
+                name = "Not Found";
+            }
+
+            return name;
         }
     }
 }
