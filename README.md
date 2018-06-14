@@ -1,9 +1,24 @@
 # DeploymentDemo
-Demo project to teach using Jenkins for automated deployments to Azure.  This will deploy a ASP.NET Core MVC web application running in a Docker container with an NGINX proxy server to Azure resources.  We will build the application in the Jenkins pipeline, including running tests for the project, and upon successful build, push the Docker images to Docker Hub, and then trigger the deployment of the images to Azure.
+The goal of this demonstration is to show how to setup and run a CI pipeline using Jenkins.  In general this tutorial will walk through the steps required to setup and execute this pipeline.  When all of the configuration steps have been completed you will be able to:
+
+1. Commit a change to a repository on GitHub
+2. The change will trigger Jenkins running in Azure to perform a build
+3. Tests in the project will be run by the build pipeline, and upon success will
+4. Create Docker images that are pushed to Docker Hub and will
+5. Push the deployment of the application to Azure Kubernetes 
 
 ## Prerequisites
+
+To configure the entire process you will require:
+
+1. An Azure account.  If you do not have one, you can sign up for one for free here: https://azure.microsoft.com/en-us/free/
+2. A GitHub account.  If you do not have one, you can sign up here:  https://github.com/join
+3. A Docker Hub account.  If you do not have one you can sign up here:  https://hub.docker.com/
+
+Let's start with the steps required to create the environments required for Jenkins and for your deployment of the application.  Sign into Azure using your account.
+
 ### Jenkins
-You need to have a Jenkins build environment.  One option is to configure one in Azure.  These instructions can get you started:  https://azuremarketplace.microsoft.com/en-us/marketplace/apps/azure-oss.jenkins?tab=Overview
+Instructions for deploying Jenkins in Azure that can help to get you started may be found here:  https://azuremarketplace.microsoft.com/en-us/marketplace/apps/azure-oss.jenkins?tab=Overview
 
 The recommended configuration for virtual machin is a D2V2, but if you are just creating this resource to learn this tutorial, you can use a smaller VM instance such as a B2s.
 
@@ -53,5 +68,52 @@ Once you have created an account, you'll need to create some repositories for th
 * test
 * nginx
 
-### Azure VM or ACI
-You need to have an environment to deploy the application against in Azure that supports Docker containers.
+### Deployment Environment
+You need to have an environment to deploy the application against in Azure that supports Docker containers.  For this demonstration, we will use AKS (Azure Kubernetes Service).  The easiest way to set this up is to use the wizard through Azure to create Kubernetes Service under your subscription.  It is recommended that production clusters have a minimum of 3 nodes, but since this is going to be used for demonstration purposes, you can specify only having one node.  
+
+Again, you can reduce the node size since this is for demonstration purposes to use a B2s or similiar for lower resource cost.
+
+You can accept all of the defaults that AKS provides in walking you through the service.  A thorough walk-through of setting up and running a AKS instance can be found here:  https://docs.microsoft.com/en-us/azure/aks/kubernetes-walkthrough-portal
+
+### Connecting Jenkins & GitHub
+
+You'll need to allow Jenkins to be able to connect to GitHub to work with your repository.  You'll do this by generating a personal access token to use with Jenkins.
+
+GitHub
+1. Settings > Developer Settings > Generate new token
+2. Provide Token description, something like "My Jenkins Server"
+3. Select scopes > repo, which will allow Jenkins to interact with your repos
+4. Copy the personal access token shown as once you navigate away from this screen you won't see the token again and will have to re-generate one if you don't have this text.
+
+Jenkins
+1. Jenkins > New Item
+2. Enter a name for this workflow, something like "Deployment Demo" and choos Multibranch Pipeline, then Ok.
+
+General
+1. General > Enter Name & Display name
+
+Branch Sources
+1. Branch Sources > Add source > GitHub
+2. Click Add button under Credentials > Jenkins (this will store the credentials and make them globally available to other jobs)
+3. Leave Domain as Global credentials
+4. Kind > Username with password
+5. Scope > Leave as Global
+6. Username > is the GitHub user ID
+7. Password > Paste in the personal access token from GitHub
+8. Once created, select the newly created credentials.  If they are correct you'll receive no errors that they are invalid credentials.
+9. Owner > specify your GitHub owner account
+10. Repository > this repository or the repository you have cloned
+11. Discover branches > Strategy > All branches
+12. Discover pull requests from origin > Strategy > Merging the pull request with the current target branch revision
+13. Close out or delete the Discover pull requests from forks
+14. Leave Property strategy alone
+
+Build Configuration
+1. Mode > by Jenkinsfile
+2. Script Path > Jenkinsfile
+
+Scan Multibranch Pipeline Triggers
+1. Check Periodically if not otherwise run
+2. Set the Interval to 15 minutes
+
+You have now configured a job in Jenkins.  Let's test by creating a PR in GitHub...
