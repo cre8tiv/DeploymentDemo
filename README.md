@@ -119,3 +119,5 @@ Scan Multibranch Pipeline Triggers
 You have now configured a job in Jenkins.  Let's test by creating a PR in GitHub...
 
 Since Jenkins is set to build on a pull request, we'll create a develop branch to trigger a build.
+
+If you've created a branch, make some change and then commit it.
