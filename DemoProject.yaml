@@ -1,0 +1,58 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: demo-web
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: demo-web
+    spec:
+      containers:
+      - name: demo-web
+        image: cre8tiv/cre8tiv-deploydemo-web
+        ports:
+        - containerPort: 7080
+          name: kestrel
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: demo-web
+spec:
+  ports:
+  - port: 7080
+  selector:
+    app: demo-web
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: demo-nginx
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: demo-nginx
+    spec:
+      containers:
+      - name: demo-nginx
+        image: cre8tiv/cre8tiv-deploydemo-nginx
+        ports:
+        - containerPort: 80
+        env:
+        - name: kestrel
+          value: "demo-web"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: demo-nginx
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+  selector:
+    app: demo-nginx

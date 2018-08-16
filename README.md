@@ -18,46 +18,13 @@ To configure the entire process you will require:
 Let's start with the steps required to create the environments required for Jenkins and for your deployment of the application.  Sign into Azure using your account.
 
 ### Jenkins
-Instructions for deploying Jenkins in Azure that can help to get you started may be found here:  https://azuremarketplace.microsoft.com/en-us/marketplace/apps/azure-oss.jenkins?tab=Overview
+Instructions for deploying Jenkins in Azure that can help to get you started may be found here:  
+https://github.com/Azure/azure-quickstart-templates/tree/master/101-jenkins
 
-The recommended configuration for virtual machin is a D2V2, but if you are just creating this resource to learn this tutorial, you can use a smaller VM instance such as a B2s.
+Follow these instructions and once you have successfully logged into Jekins, perform these steps:
 
-Much of the following steps come from this source:  https://github.com/Azure/azure-quickstart-templates/tree/master/201-jenkins-acr
-
-#### Connect to Jenkins with SSH port forwarding
-By default the Jenkins instance is using the http protocol and listens on port 8080. Users shouldn't authenticate over unsecured protocols!
-
-You need to setup port forwarding to view the Jenkins UI on your local machine. If you do not know the full DNS name of your instance, go to the Portal and find it in the deployment outputs here: Resource Groups > {Resource Group Name} > Deployments > {Deployment Name, usually 'Microsoft.Template'} > Outputs
-
-Note that in the following steps, we are mapping the Jenkins UI to port 8080.  If you wish to use another port, then substitute that port number in the commands below.
-
-##### If you are using Windows:
-Install Putty or use any bash shell for Windows (if using a bash shell, follow the instructions for Linux or Mac).
-
-Run this command:
-
-```putty.exe -ssh -L 8080:localhost:8080 <User name>@<Public DNS name of instance you just created>```
-
-Or follow these manual steps:
-
-1. Launch Putty and navigate to 'Connection > SSH > Tunnels'
-2. In the Options controlling SSH port forwarding window, enter 8080 for Source port. Then enter 127.0.0.1:8080 for the Destination. Click Add.
-3. Click Open to establish the connection.
-
-##### If you are using Linux or Mac:
-Run this command:
-
-```ssh -L 8080:localhost:8080 <User name>@<Public DNS name of instance you just created>```
-
-Connecting
-
-1. After you have started your tunnel, navigate to http://localhost:8080/ on your local machine.
-2. Unlock the Jenkins dashboard for the first time with the initial admin password. To get this token, SSH into the VM and run sudo cat /var/lib/jenkins/secrets/initialAdminPassword
-3. Your Jenkins instance is now ready to use! You can access a read-only view by going to http://< Public DNS name of instance you just created >.
-4. Go ahead and install the common plugins that Jenkis recommends
-5. Create a first admin user.  After you do so, you may find that the Setup Wizard completes, but shows a blank screen when you are done.  
-
-4. Go to http://aka.ms/azjenkinsagents if you want to build/CI from this Jenkins master using Azure VM agents.
+1. Install suggested plugins
+2. Create the first Admin user
 
 ### Docker Hub
 You need to have a Docker hub account.  Create one here:  https://hub.docker.com
@@ -75,19 +42,23 @@ Again, you can reduce the node size since this is for demonstration purposes to 
 
 You can accept all of the defaults that AKS provides in walking you through the service.  A thorough walk-through of setting up and running a AKS instance can be found here:  https://docs.microsoft.com/en-us/azure/aks/kubernetes-walkthrough-portal
 
+1. From the CloudShell prompt, set the subscription you want to use, i.e.: az account set --subscription "Visual Studio Professional"
+2. Deploy a Kubernetes cluster: az aks create --resource-group <your resource group name> --name myAKSCluster --node-count 1 --enable-addons monitoring --generate-ssh-keys
+
+
 ### Connecting Jenkins & GitHub
 
 You'll need to allow Jenkins to be able to connect to GitHub to work with your repository.  You'll do this by generating a personal access token to use with Jenkins.
 
 GitHub
-1. Settings > Developer Settings > Generate new token
+1. Settings > Developer Settings > Personal access tokens > Generate new token
 2. Provide Token description, something like "My Jenkins Server"
 3. Select scopes > repo, which will allow Jenkins to interact with your repos
 4. Copy the personal access token shown as once you navigate away from this screen you won't see the token again and will have to re-generate one if you don't have this text.
 
 Jenkins
 1. Jenkins > New Item
-2. Enter a name for this workflow, something like "Deployment Demo" and choos Multibranch Pipeline, then Ok.
+2. Enter a name for this workflow, something like "Deployment Demo" and choose Multibranch Pipeline, then Ok.
 
 General
 1. General > Enter Name & Display name
@@ -116,8 +87,11 @@ Scan Multibranch Pipeline Triggers
 1. Check Periodically if not otherwise run
 2. Set the Interval to 15 minutes
 
+
 You have now configured a job in Jenkins.  Let's test by creating a PR in GitHub...
 
 Since Jenkins is set to build on a pull request, we'll create a develop branch to trigger a build.
 
 If you've created a branch, make some change and then commit it.
+
+Create a pull request on GitHub.
