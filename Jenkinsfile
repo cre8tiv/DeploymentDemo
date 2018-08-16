@@ -74,12 +74,8 @@ node('docker') {
         // Release on master, debug on staging and other branches
         if (GIT_BRANCH == 'master') {
           webImage = docker.build("cre8tiv/cre8tiv-deploydemo-web:${GIT_COMMIT}", "-f ./docker/Dockerfile.web.prod .")
-          //leaving this to facilitate future testing to deploy to staging
-          //webImage = docker.build("cre8tiv/cre8tiv-deploydemo-web:develop", "-f ./docker/Dockerfile.web.prod .")
         } else {
           webImage = docker.build("cre8tiv/cre8tiv-deploydemo-web:${GIT_COMMIT}", "-f ./docker/Dockerfile.web.staging .")
-          //leaving this to facilitate future testing to deploy to staging
-          //webImage = docker.build("cre8tiv/cre8tiv-deploydemo-web:develop", "-f ./docker/Dockerfile.web.staging .")
         }
       }
 
@@ -88,8 +84,6 @@ node('docker') {
         try {
           // Build nginx image.
           nginxImage = docker.build("cre8tiv/cre8tiv-deploydemo-nginx:${GIT_COMMIT}", "-f ./docker/Dockerfile.nginx .")
-          //leaving this to facilitate future testing to deploy to staging
-          //nginxImage = docker.build("cre8tiv/cre8tiv-deploydemo-nginx:develop", "-f ./docker/Dockerfile.nginx .")
 
           // The first parameter is the uri of the registry.
           // It defaults to DockerHub if left blank.
@@ -97,13 +91,9 @@ node('docker') {
             // Push image tagged with the current branch name
             webImage.push(GIT_COMMIT)
             webImage.push(GIT_BRANCH)
-            //leaving this to facilitate future testing to deploy to staging
-            //webImage.push("develop")
 
             nginxImage.push(GIT_COMMIT)
             nginxImage.push(GIT_BRANCH)
-            //leaving this to facilitate future testing to deploy to staging
-            //nginxImage.push("develop")
           }
         } catch (Exception) {
           currentBuild.result = 'UNSTABLE'
